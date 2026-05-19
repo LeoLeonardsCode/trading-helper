@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Trading 212 Investment Assistant</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <section class="auth-shell" id="authShell">
+      <div class="auth-panel">
+        <div class="brand auth-brand">
+          <div class="brand-mark" aria-hidden="true">212</div>
+          <div>
+            <strong>Investment Assistant</strong>
+            <span>Private portfolio workspace</span>
+          </div>
+        </div>
+
+        <div class="auth-tabs" role="tablist" aria-label="Account access">
+          <button class="auth-tab active" type="button" data-auth-mode="login">Log in</button>
+          <button class="auth-tab" type="button" data-auth-mode="signup">Create account</button>
+        </div>
+
+        <form id="loginForm" class="auth-form">
+          <label>
+            Email
+            <input name="email" type="email" autocomplete="email" placeholder="you@example.com" required />
+          </label>
+          <label>
+            Password
+            <input name="password" type="password" autocomplete="current-password" placeholder="Your password" required />
+          </label>
+          <button class="primary-button" type="submit">Log in</button>
+        </form>
+
+        <form id="signupForm" class="auth-form hidden">
+          <label>
+            Name
+            <input name="name" type="text" autocomplete="name" placeholder="Your name" required />
+          </label>
+          <label>
+            Email
+            <input name="email" type="email" autocomplete="email" placeholder="you@example.com" required />
+          </label>
+          <label>
+            Password
+            <input name="password" type="password" autocomplete="new-password" placeholder="At least 8 characters" required />
+          </label>
+          <button class="primary-button" type="submit">Create account</button>
+        </form>
+
+        <p class="auth-note">Your app account is stored locally on this computer. Trading 212 credentials are encrypted before they are saved.</p>
+      </div>
+    </section>
+
+    <div class="app-shell hidden" id="appShell">
+      <aside class="sidebar" aria-label="Portfolio navigation">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">212</div>
+          <div>
+            <strong>Investment Assistant</strong>
+            <span>Trading 212 monitor</span>
+          </div>
+        </div>
+
+        <section class="user-panel" aria-label="App account">
+          <span>Signed in</span>
+          <strong id="userName">-</strong>
+          <small id="userEmail">-</small>
+          <button class="quiet-button" id="logoutButton" type="button">Log out</button>
+        </section>
+
+        <nav class="nav-list" aria-label="Views">
+          <button class="nav-item active" type="button" data-view="overview">Overview</button>
+          <button class="nav-item" type="button" data-view="positions">Positions</button>
+          <button class="nav-item" type="button" data-view="reports">Reports</button>
+          <button class="nav-item" type="button" data-view="settings">Settings</button>
+        </nav>
+
+        <section class="connection-panel" aria-label="Trading 212 connection">
+          <div class="panel-heading">
+            <span>Connection</span>
+            <strong id="connectionMode">Mock</strong>
+          </div>
+          <p class="connection-summary" id="connectionSummary">Use Settings to connect Trading 212.</p>
+          <button class="quiet-button" id="openSettingsButton" type="button">Open settings</button>
+        </section>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow" id="environmentLabel">Demo workspace</p>
+            <h1>Portfolio overview</h1>
+          </div>
+          <div class="topbar-actions">
+            <span class="sync-status" id="syncStatus">Ready</span>
+            <button class="secondary-button" id="syncButton" type="button">Sync now</button>
+          </div>
+        </header>
+
+        <section class="alert hidden" id="alertBox" aria-live="polite"></section>
+
+        <section class="metrics-grid" aria-label="Account metrics">
+          <article class="metric">
+            <span>Total value</span>
+            <strong id="totalValue">-</strong>
+            <small id="totalValueHint">Account value</small>
+          </article>
+          <article class="metric">
+            <span>Invested</span>
+            <strong id="investedValue">-</strong>
+            <small id="investedHint">Current market value</small>
+          </article>
+          <article class="metric">
+            <span>Cash</span>
+            <strong id="cashValue">-</strong>
+            <small id="cashHint">Available to trade</small>
+          </article>
+          <article class="metric">
+            <span>Unrealized P/L</span>
+            <strong id="profitValue">-</strong>
+            <small id="profitHint">Open positions</small>
+          </article>
+        </section>
+
+        <section class="overview-grid" id="overviewView">
+          <div class="chart-panel">
+            <div class="section-heading">
+              <div>
+                <span>Performance</span>
+                <h2>Account value trend</h2>
+              </div>
+              <div class="chart-controls" aria-label="Graph controls">
+                <select id="chartMetric" aria-label="Graph metric">
+                  <option value="totalValue">Total value</option>
+                  <option value="investedValue">Invested value</option>
+                  <option value="cashAvailable">Cash</option>
+                  <option value="unrealizedProfitLoss">Unrealized P/L</option>
+                </select>
+                <select id="chartPeriod" aria-label="Graph period">
+                  <option value="7d">7 days</option>
+                  <option value="30d" selected>30 days</option>
+                  <option value="90d">90 days</option>
+                  <option value="1y">1 year</option>
+                  <option value="all">All</option>
+                </select>
+              </div>
+            </div>
+            <canvas id="historyChart" width="900" height="320" aria-label="Account value trend chart"></canvas>
+            <p class="chart-caption" id="historyCaption">Sync more than once to build a trend.</p>
+          </div>
+
+          <div class="chart-panel compact">
+            <div class="section-heading">
+              <div>
+                <span>Allocation</span>
+                <h2>By holding</h2>
+              </div>
+            </div>
+            <canvas id="allocationChart" width="360" height="300" aria-label="Portfolio allocation chart"></canvas>
+            <div class="legend" id="allocationLegend"></div>
+          </div>
+
+          <div class="insights-panel">
+            <div class="section-heading">
+              <div>
+                <span>Monitor</span>
+                <h2>Portfolio signals</h2>
+              </div>
+            </div>
+            <div class="insights-grid" id="insightsGrid"></div>
+          </div>
+
+          <div class="chart-panel compact">
+            <div class="section-heading">
+              <div>
+                <span>Exposure</span>
+                <h2>Asset mix</h2>
+              </div>
+            </div>
+            <div class="bar-list" id="typeAllocation"></div>
+          </div>
+
+          <div class="analytics-panel">
+            <div class="section-heading">
+              <div>
+                <span>Details</span>
+                <h2>Account breakdown</h2>
+              </div>
+            </div>
+            <div class="account-breakdown" id="accountBreakdown"></div>
+          </div>
+
+          <div class="analytics-panel">
+            <div class="section-heading">
+              <div>
+                <span>Holdings</span>
+                <h2>Top movers</h2>
+              </div>
+            </div>
+            <div class="mover-list" id="topMovers"></div>
+          </div>
+        </section>
+
+        <section class="positions-view hidden" id="positionsView">
+          <div class="section-heading">
+            <div>
+              <span>Holdings</span>
+              <h2>Open positions</h2>
+            </div>
+            <div class="positions-tools">
+              <input id="positionSearch" class="search-input" type="search" placeholder="Search ticker or name" />
+              <select id="typeFilter" aria-label="Filter by type">
+                <option value="all">All types</option>
+              </select>
+              <select id="sortSelect" aria-label="Sort positions">
+                <option value="currentValue:desc">Value high to low</option>
+                <option value="currentValue:asc">Value low to high</option>
+                <option value="unrealizedProfitLoss:desc">Profit high to low</option>
+                <option value="unrealizedProfitLoss:asc">Loss high to low</option>
+                <option value="unrealizedReturn:desc">Return high to low</option>
+                <option value="unrealizedReturn:asc">Return low to high</option>
+                <option value="ticker:asc">Ticker A to Z</option>
+                <option value="ticker:desc">Ticker Z to A</option>
+                <option value="type:asc">Type A to Z</option>
+                <option value="type:desc">Type Z to A</option>
+                <option value="quantity:desc">Quantity high to low</option>
+                <option value="quantity:asc">Quantity low to high</option>
+                <option value="averagePricePaid:desc">Average price high to low</option>
+                <option value="averagePricePaid:asc">Average price low to high</option>
+                <option value="currentPrice:desc">Current price high to low</option>
+                <option value="currentPrice:asc">Current price low to high</option>
+              </select>
+            </div>
+          </div>
+          <div class="position-summary" id="positionSummary"></div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th><button class="sort-header" type="button" data-sort-key="ticker">Instrument</button></th>
+                  <th><button class="sort-header" type="button" data-sort-key="type">Type</button></th>
+                  <th><button class="sort-header" type="button" data-sort-key="quantity">Qty</button></th>
+                  <th><button class="sort-header" type="button" data-sort-key="averagePricePaid">Avg price</button></th>
+                  <th><button class="sort-header" type="button" data-sort-key="currentPrice">Current</button></th>
+                  <th><button class="sort-header" type="button" data-sort-key="currentValue">Value</button></th>
+                  <th><button class="sort-header" type="button" data-sort-key="unrealizedProfitLoss">P/L</button></th>
+                </tr>
+              </thead>
+              <tbody id="positionsTable"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="reports-view hidden" id="reportsView">
+          <div class="section-heading">
+            <div>
+              <span>Reports</span>
+              <h2>Monthly summary draft</h2>
+            </div>
+            <button class="secondary-button" id="copyReportButton" type="button">Copy report</button>
+          </div>
+          <article class="report-preview" id="reportPreview"></article>
+        </section>
+
+        <section class="settings-view hidden" id="settingsView">
+          <div class="section-heading">
+            <div>
+              <span>Settings</span>
+              <h2>Account and Trading 212</h2>
+            </div>
+          </div>
+
+          <div class="settings-grid">
+            <article class="settings-card">
+              <div class="section-heading">
+                <div>
+                  <span>Trading 212</span>
+                  <h2>API connection</h2>
+                </div>
+                <strong class="status-pill" id="settingsConnectionStatus">Mock</strong>
+              </div>
+
+              <p class="settings-note">Use the same environment where you generated the API key. Real-money portfolio data needs the Live environment.</p>
+
+              <form id="connectForm" class="settings-form">
+                <label>
+                  Environment
+                  <select name="environment" id="settingsEnvironment">
+                    <option value="demo" selected>Demo</option>
+                    <option value="live">Live</option>
+                  </select>
+                </label>
+                <label>
+                  API key
+                  <input name="apiKey" type="password" autocomplete="off" placeholder="Trading 212 API key" required />
+                </label>
+                <label>
+                  API secret
+                  <input name="apiSecret" type="password" autocomplete="off" placeholder="Trading 212 API secret" required />
+                </label>
+                <div class="form-actions">
+                  <button class="primary-button" type="submit">Test and save</button>
+                  <button class="secondary-button" id="disconnectButton" type="button">Remove connection</button>
+                </div>
+              </form>
+
+              <dl class="settings-facts">
+                <div>
+                  <dt>Saved environment</dt>
+                  <dd id="savedEnvironment">Demo</dd>
+                </div>
+                <div>
+                  <dt>Last sync</dt>
+                  <dd id="savedLastSync">Never</dd>
+                </div>
+                <div>
+                  <dt>Account preview</dt>
+                  <dd id="savedAccountPreview">Not connected</dd>
+                </div>
+              </dl>
+
+              <div class="diagnostics-panel">
+                <button class="secondary-button" id="diagnosticsButton" type="button">Check API reachability</button>
+                <p id="diagnosticsResult">Not checked yet.</p>
+              </div>
+            </article>
+
+            <article class="settings-card">
+              <div class="section-heading">
+                <div>
+                  <span>Profile</span>
+                  <h2>Name and email</h2>
+                </div>
+              </div>
+
+              <form id="profileForm" class="settings-form">
+                <label>
+                  Name
+                  <input name="name" id="profileName" type="text" autocomplete="name" required />
+                </label>
+                <label>
+                  Email
+                  <input name="email" id="profileEmail" type="email" autocomplete="email" required />
+                </label>
+                <button class="primary-button" type="submit">Save profile</button>
+              </form>
+            </article>
+
+            <article class="settings-card">
+              <div class="section-heading">
+                <div>
+                  <span>Security</span>
+                  <h2>Password</h2>
+                </div>
+              </div>
+
+              <form id="passwordForm" class="settings-form">
+                <label>
+                  Current password
+                  <input name="currentPassword" type="password" autocomplete="current-password" required />
+                </label>
+                <label>
+                  New password
+                  <input name="newPassword" type="password" autocomplete="new-password" placeholder="At least 8 characters" required />
+                </label>
+                <button class="primary-button" type="submit">Change password</button>
+              </form>
+            </article>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/app.js"></script>
+  </body>
+</html>
