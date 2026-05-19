@@ -1,0 +1,7 @@
+node_modules/
+.env
+data/
+*.log
+trading-platform-local.zip
+.codex-git-*
+.codex-known-hosts
